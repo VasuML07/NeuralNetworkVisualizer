@@ -93,9 +93,7 @@ cd NeuralNetworkVisualizer
 npm install
 npm run dev
 
-Open:
-
-http://localhost:3000
+Open:https://neural-network-visualizer-gamma.vercel.app/
 🎮 Usage
 1️⃣ Create Architecture
 
