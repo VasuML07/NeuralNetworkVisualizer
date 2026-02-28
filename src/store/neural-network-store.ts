@@ -8,16 +8,18 @@ import {
   ViewMode,
   TrainingConfig,
   TrainingState,
-  VisualizationSettings
+  VisualizationSettings,
+  LAYER_COLORS
 } from '@/types/neural-network';
 
 const generateId = () => Math.random().toString(36).substring(2, 11);
 
-const createDefaultLayer = (type: NeuralLayer['type'], index: number): NeuralLayer => {
+// Layer factory with proper defaults
+const createLayer = (type: NeuralLayer['type'], index: number, prevUnits?: number): NeuralLayer => {
   const baseLayer: NeuralLayer = {
     id: generateId(),
     type,
-    name: `${type.charAt(0).toUpperCase() + type.slice(1)} ${index + 1}`,
+    name: `${type.charAt(0).toUpperCase() + type.slice(1).replace('2d', '')} ${index + 1}`,
     units: 64,
     activation: 'relu',
     useBias: true,
@@ -26,60 +28,121 @@ const createDefaultLayer = (type: NeuralLayer['type'], index: number): NeuralLay
 
   switch (type) {
     case 'input':
-      return { ...baseLayer, units: 784, name: 'Input' };
+      return { 
+        ...baseLayer, 
+        units: 784, 
+        name: 'Input',
+        activation: 'linear'
+      };
     case 'dense':
-      return { ...baseLayer, units: 128, activation: 'relu' };
+      return { 
+        ...baseLayer, 
+        units: prevUnits ? Math.max(32, Math.floor(prevUnits / 2)) : 128, 
+        activation: 'relu' 
+      };
     case 'conv2d':
-      return { ...baseLayer, filters: 32, kernelSize: [3, 3], stride: [1, 1], padding: 'same', activation: 'relu' };
+      return { 
+        ...baseLayer, 
+        filters: 32, 
+        kernelSize: [3, 3], 
+        stride: [1, 1], 
+        padding: 'same', 
+        activation: 'relu',
+        units: 0 // Not applicable for conv layers
+      };
     case 'maxpool2d':
-      return { ...baseLayer, kernelSize: [2, 2], stride: [2, 2], name: `MaxPool ${index + 1}` };
+      return { 
+        ...baseLayer, 
+        kernelSize: [2, 2], 
+        stride: [2, 2], 
+        name: `MaxPool ${index + 1}`,
+        activation: 'linear',
+        units: 0
+      };
     case 'avgpool2d':
-      return { ...baseLayer, kernelSize: [2, 2], stride: [2, 2], name: `AvgPool ${index + 1}` };
+      return { 
+        ...baseLayer, 
+        kernelSize: [2, 2], 
+        stride: [2, 2], 
+        name: `AvgPool ${index + 1}`,
+        activation: 'linear',
+        units: 0
+      };
     case 'dropout':
-      return { ...baseLayer, dropout: 0.5, name: `Dropout ${index + 1}` };
+      return { 
+        ...baseLayer, 
+        dropout: 0.5, 
+        name: `Dropout ${index + 1}`,
+        activation: 'linear',
+        units: 0
+      };
     case 'batchnorm':
-      return { ...baseLayer, name: `BatchNorm ${index + 1}` };
+      return { 
+        ...baseLayer, 
+        name: `BatchNorm ${index + 1}`,
+        activation: 'linear',
+        units: 0
+      };
     case 'lstm':
-      return { ...baseLayer, units: 64, activation: 'tanh' };
+      return { 
+        ...baseLayer, 
+        units: 64, 
+        activation: 'tanh' 
+      };
     case 'gru':
-      return { ...baseLayer, units: 64, activation: 'tanh' };
+      return { 
+        ...baseLayer, 
+        units: 64, 
+        activation: 'tanh' 
+      };
+    case 'flatten':
+      return { 
+        ...baseLayer, 
+        name: `Flatten ${index + 1}`,
+        activation: 'linear',
+        units: 0
+      };
     case 'output':
-      return { ...baseLayer, units: 10, activation: 'softmax', name: 'Output' };
+      return { 
+        ...baseLayer, 
+        units: 10, 
+        activation: 'softmax', 
+        name: 'Output' 
+      };
     default:
       return baseLayer;
   }
 };
 
+// Preset architectures
 export const NETWORK_PRESETS: NetworkPreset[] = [
   {
     id: 'mlp-basic',
     name: 'Basic MLP',
-    description: 'Simple feedforward network for classification',
+    description: 'Simple 2-layer network for classification',
     category: 'mlp',
     inputShape: [784],
     layers: [
-      createDefaultLayer('input', 0),
-      { ...createDefaultLayer('dense', 0), id: generateId(), name: 'Hidden 1', units: 256 },
-      { ...createDefaultLayer('dense', 1), id: generateId(), name: 'Hidden 2', units: 128 },
-      { ...createDefaultLayer('dropout', 0), id: generateId(), dropout: 0.3 },
-      { ...createDefaultLayer('output', 0), id: generateId(), units: 10 },
+      createLayer('input', 0),
+      createLayer('dense', 1, 784),
+      createLayer('dense', 2, 128),
+      createLayer('output', 3, 64),
     ],
   },
   {
     id: 'mlp-deep',
     name: 'Deep MLP',
-    description: 'Deep feedforward network with 5 hidden layers',
+    description: '4 hidden layers with dropout',
     category: 'mlp',
     inputShape: [784],
     layers: [
-      createDefaultLayer('input', 0),
-      { ...createDefaultLayer('dense', 0), id: generateId(), name: 'Hidden 1', units: 512 },
-      { ...createDefaultLayer('batchnorm', 0), id: generateId() },
-      { ...createDefaultLayer('dense', 1), id: generateId(), name: 'Hidden 2', units: 256 },
-      { ...createDefaultLayer('dropout', 0), id: generateId(), dropout: 0.2 },
-      { ...createDefaultLayer('dense', 2), id: generateId(), name: 'Hidden 3', units: 128 },
-      { ...createDefaultLayer('dense', 3), id: generateId(), name: 'Hidden 4', units: 64 },
-      { ...createDefaultLayer('output', 0), id: generateId(), units: 10 },
+      createLayer('input', 0),
+      createLayer('dense', 1, 784),
+      createLayer('dropout', 2),
+      createLayer('dense', 3, 256),
+      createLayer('dense', 4, 128),
+      createLayer('dense', 5, 64),
+      createLayer('output', 6, 64),
     ],
   },
   {
@@ -89,51 +152,15 @@ export const NETWORK_PRESETS: NetworkPreset[] = [
     category: 'cnn',
     inputShape: [28, 28, 1],
     layers: [
-      createDefaultLayer('input', 0),
-      { ...createDefaultLayer('conv2d', 0), id: generateId(), filters: 32, kernelSize: [3, 3], name: 'Conv 1' },
-      { ...createDefaultLayer('maxpool2d', 0), id: generateId(), name: 'Pool 1' },
-      { ...createDefaultLayer('conv2d', 1), id: generateId(), filters: 64, kernelSize: [3, 3], name: 'Conv 2' },
-      { ...createDefaultLayer('maxpool2d', 1), id: generateId(), name: 'Pool 2' },
-      { ...createDefaultLayer('flatten', 0), id: generateId(), name: 'Flatten' },
-      { ...createDefaultLayer('dense', 0), id: generateId(), units: 128, name: 'FC 1' },
-      { ...createDefaultLayer('dropout', 0), id: generateId(), dropout: 0.5 },
-      { ...createDefaultLayer('output', 0), id: generateId(), units: 10 },
-    ],
-  },
-  {
-    id: 'cnn-vgg',
-    name: 'VGG-style CNN',
-    description: 'VGG-style convolutional network',
-    category: 'cnn',
-    inputShape: [224, 224, 3],
-    layers: [
-      createDefaultLayer('input', 0),
-      { ...createDefaultLayer('conv2d', 0), id: generateId(), filters: 64, kernelSize: [3, 3], name: 'Conv 1' },
-      { ...createDefaultLayer('conv2d', 1), id: generateId(), filters: 64, kernelSize: [3, 3], name: 'Conv 2' },
-      { ...createDefaultLayer('maxpool2d', 0), id: generateId(), name: 'Pool 1' },
-      { ...createDefaultLayer('conv2d', 2), id: generateId(), filters: 128, kernelSize: [3, 3], name: 'Conv 3' },
-      { ...createDefaultLayer('conv2d', 3), id: generateId(), filters: 128, kernelSize: [3, 3], name: 'Conv 4' },
-      { ...createDefaultLayer('maxpool2d', 1), id: generateId(), name: 'Pool 2' },
-      { ...createDefaultLayer('flatten', 0), id: generateId(), name: 'Flatten' },
-      { ...createDefaultLayer('dense', 0), id: generateId(), units: 512, name: 'FC 1' },
-      { ...createDefaultLayer('dropout', 0), id: generateId(), dropout: 0.5 },
-      { ...createDefaultLayer('dense', 1), id: generateId(), units: 256, name: 'FC 2' },
-      { ...createDefaultLayer('output', 0), id: generateId(), units: 1000 },
-    ],
-  },
-  {
-    id: 'lstm-sentiment',
-    name: 'LSTM Sentiment',
-    description: 'LSTM network for sequence classification',
-    category: 'rnn',
-    inputShape: [100, 128],
-    layers: [
-      createDefaultLayer('input', 0),
-      { ...createDefaultLayer('embedding', 0), id: generateId(), units: 128, name: 'Embedding' },
-      { ...createDefaultLayer('lstm', 0), id: generateId(), units: 128, name: 'LSTM 1' },
-      { ...createDefaultLayer('dropout', 0), id: generateId(), dropout: 0.5 },
-      { ...createDefaultLayer('dense', 0), id: generateId(), units: 64, name: 'FC 1' },
-      { ...createDefaultLayer('output', 0), id: generateId(), units: 2, activation: 'sigmoid' },
+      createLayer('input', 0),
+      createLayer('conv2d', 1),
+      createLayer('maxpool2d', 2),
+      createLayer('conv2d', 3),
+      createLayer('maxpool2d', 4),
+      createLayer('flatten', 5),
+      createLayer('dense', 6, 128),
+      createLayer('dropout', 7),
+      createLayer('output', 8, 64),
     ],
   },
   {
@@ -143,13 +170,27 @@ export const NETWORK_PRESETS: NetworkPreset[] = [
     category: 'autoencoder',
     inputShape: [784],
     layers: [
-      createDefaultLayer('input', 0),
-      { ...createDefaultLayer('dense', 0), id: generateId(), name: 'Encoder 1', units: 256 },
-      { ...createDefaultLayer('dense', 1), id: generateId(), name: 'Encoder 2', units: 128 },
-      { ...createDefaultLayer('dense', 2), id: generateId(), name: 'Latent', units: 32 },
-      { ...createDefaultLayer('dense', 3), id: generateId(), name: 'Decoder 1', units: 128 },
-      { ...createDefaultLayer('dense', 4), id: generateId(), name: 'Decoder 2', units: 256 },
-      { ...createDefaultLayer('output', 0), id: generateId(), units: 784, activation: 'sigmoid' },
+      createLayer('input', 0),
+      createLayer('dense', 1, 784),
+      createLayer('dense', 2, 256),
+      createLayer('dense', 3, 64),
+      createLayer('dense', 4, 256),
+      createLayer('dense', 5, 784),
+      createLayer('output', 6, 784),
+    ],
+  },
+  {
+    id: 'lstm-text',
+    name: 'LSTM Network',
+    description: 'Recurrent network for sequences',
+    category: 'rnn',
+    inputShape: [100, 64],
+    layers: [
+      createLayer('input', 0),
+      createLayer('lstm', 1, 64),
+      createLayer('dropout', 2),
+      createLayer('dense', 3, 32),
+      createLayer('output', 4, 32),
     ],
   },
 ];
@@ -220,18 +261,31 @@ interface NeuralNetworkState {
   toggleSection: (section: 'architecture' | 'training' | 'visualization' | 'code') => void;
 }
 
-const createDefaultNetwork = (): NetworkConfig => ({
-  id: generateId(),
-  name: 'My Neural Network',
-  layers: [
-    createDefaultLayer('input', 0),
-    { ...createDefaultLayer('dense', 0), id: generateId(), name: 'Hidden Layer', units: 64 },
-    createDefaultLayer('output', 0),
-  ],
-  inputShape: [784],
-  createdAt: new Date(),
-  updatedAt: new Date(),
-});
+const createDefaultNetwork = (): NetworkConfig => {
+  const layers = [
+    createLayer('input', 0),
+    createLayer('dense', 1, 784),
+    createLayer('dense', 2, 64),
+    createLayer('output', 3, 64),
+  ];
+  
+  // Assign proper IDs
+  layers.forEach((l, i) => {
+    l.id = generateId();
+    l.name = l.type === 'input' ? 'Input' : 
+             l.type === 'output' ? 'Output' : 
+             `${l.type.charAt(0).toUpperCase() + l.type.slice(1)} ${i}`;
+  });
+  
+  return {
+    id: generateId(),
+    name: 'My Network',
+    layers,
+    inputShape: [784],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+};
 
 export const useNeuralNetworkStore = create<NeuralNetworkState>((set, get) => ({
   // Network State
@@ -298,19 +352,44 @@ export const useNeuralNetworkStore = create<NeuralNetworkState>((set, get) => ({
 
   addLayer: (type, afterIndex) => {
     const { network } = get();
-    const newLayer = createDefaultLayer(type, network.layers.length);
-    const insertIndex = afterIndex !== undefined ? afterIndex + 1 : network.layers.length - 1;
-    const newLayers = [...network.layers];
+    const layers = network.layers;
+    
+    // Limit max layers
+    if (layers.length >= 20) {
+      return;
+    }
+    
+    // Determine insert position
+    const insertIndex = afterIndex !== undefined ? afterIndex + 1 : layers.length - 1;
+    const prevLayer = layers[insertIndex - 1] || layers[0];
+    
+    // Create new layer
+    const newLayer = createLayer(type, insertIndex, prevLayer?.units);
+    newLayer.id = generateId();
+    
+    // Insert layer
+    const newLayers = [...layers];
     newLayers.splice(insertIndex, 0, newLayer);
+    
     set({
-      network: { ...network, layers: newLayers, updatedAt: new Date() },
+      network: { 
+        ...network, 
+        layers: newLayers, 
+        updatedAt: new Date() 
+      },
       selectedLayerId: newLayer.id,
     });
   },
 
   removeLayer: (layerId) => {
     const { network, selectedLayerId } = get();
-    if (network.layers.length <= 2) return;
+    const layer = network.layers.find(l => l.id === layerId);
+    
+    // Prevent removing input/output or going below 3 layers
+    if (network.layers.length <= 3 || layer?.type === 'input' || layer?.type === 'output') {
+      return;
+    }
+    
     set({
       network: {
         ...network,
@@ -334,9 +413,17 @@ export const useNeuralNetworkStore = create<NeuralNetworkState>((set, get) => ({
 
   reorderLayers: (fromIndex, toIndex) => {
     const { network } = get();
+    
+    // Prevent moving input/output
+    if (fromIndex === 0 || fromIndex === network.layers.length - 1 || 
+        toIndex === 0 || toIndex === network.layers.length - 1) {
+      return;
+    }
+    
     const newLayers = [...network.layers];
     const [removed] = newLayers.splice(fromIndex, 1);
     newLayers.splice(toIndex, 0, removed);
+    
     set({ network: { ...network, layers: newLayers, updatedAt: new Date() } });
   },
 
@@ -345,27 +432,31 @@ export const useNeuralNetworkStore = create<NeuralNetworkState>((set, get) => ({
   loadPreset: (presetId) => {
     const preset = get().presets.find((p) => p.id === presetId);
     if (preset) {
+      const layers = preset.layers.map((l, i) => ({
+        ...l,
+        id: generateId(),
+        name: l.type === 'input' ? 'Input' : 
+              l.type === 'output' ? 'Output' : 
+              `${l.type.charAt(0).toUpperCase() + l.type.slice(1).replace('2d', '')} ${i}`
+      }));
+      
       set({
         network: {
           id: generateId(),
           name: preset.name,
-          layers: preset.layers.map(() => ({ ...createDefaultLayer('dense', 0), id: generateId() })),
+          layers,
           inputShape: preset.inputShape,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         selectedLayerId: null,
-      });
-      // Reload with correct preset layers
-      const state = get();
-      set({
-        network: {
-          id: generateId(),
-          name: preset.name,
-          layers: preset.layers.map(l => ({ ...l, id: generateId() })),
-          inputShape: preset.inputShape,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+        training: {
+          isTraining: false,
+          currentEpoch: 0,
+          currentLoss: 0,
+          currentAccuracy: 0,
+          lossHistory: [],
+          accuracyHistory: [],
         },
       });
     }

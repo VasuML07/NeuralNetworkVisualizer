@@ -150,3 +150,58 @@ export const LAYER_ICONS: Record<LayerType, string> = {
   attention: '@',
   output: 'O',
 };
+
+// Additional types for store
+export type ViewMode = 'beginner' | 'advanced';
+
+export type Optimizer = 'adam' | 'sgd' | 'rmsprop' | 'adamw' | 'adagrad';
+export type LossFunction = 'cross_entropy' | 'mse' | 'mae' | 'binary_crossentropy';
+
+export interface TrainingConfig {
+  learningRate: number;
+  epochs: number;
+  batchSize: number;
+  optimizer: Optimizer;
+  lossFunction: LossFunction;
+}
+
+export interface TrainingState {
+  isTraining: boolean;
+  currentEpoch: number;
+  currentLoss: number;
+  currentAccuracy: number;
+  lossHistory: number[];
+  accuracyHistory: number[];
+}
+
+export interface VisualizationSettings {
+  showWeights: boolean;
+  showActivations: boolean;
+  showGradients: boolean;
+  animateTraining: boolean;
+}
+
+export interface AnimationState {
+  isPlaying: boolean;
+  speed: number;
+  currentStep: number;
+  totalSteps: number;
+}
+
+export type Framework = 'pytorch' | 'tensorflow' | 'jax' | 'keras';
+
+export interface CodeGenerationOptions {
+  framework: Framework;
+  includeTraining: boolean;
+  includeComments: boolean;
+  className: string;
+}
+
+export interface NetworkPreset {
+  id: string;
+  name: string;
+  description: string;
+  category: 'mlp' | 'cnn' | 'rnn' | 'transformer' | 'autoencoder';
+  layers: NeuralLayer[];
+  inputShape: number[];
+}
