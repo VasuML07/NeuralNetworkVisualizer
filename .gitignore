@@ -49,3 +49,9 @@ prompt
 server.log
 # Skills directory
 /skills/
+
+# Download folder
+/download/
+
+# Database files
+/db/
