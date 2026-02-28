@@ -1,141 +1,380 @@
-# 🚀 Welcome to Z.ai Code Scaffold
+# 🧠 Neural Network Visualizer
 
-A modern, production-ready web application scaffold powered by cutting-edge technologies, designed to accelerate your development with [Z.ai](https://chat.z.ai)'s AI-powered coding assistance.
+**Design • Visualize • Understand Neural Networks through an interactive web interface.**
 
-## ✨ Technology Stack
+A modern, interactive web application that helps developers, students, and researchers design and understand neural network architectures visually. Built with Next.js 16, TypeScript, and Canvas API for high-quality visualizations.
 
-This scaffold provides a robust foundation built with:
+![Neural Network Visualizer](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38B2AC?style=for-the-badge&logo=tailwind-css)
 
-### 🎯 Core Framework
-- **⚡ Next.js 16** - The React framework for production with App Router
-- **📘 TypeScript 5** - Type-safe JavaScript for better developer experience
-- **🎨 Tailwind CSS 4** - Utility-first CSS framework for rapid UI development
+---
 
-### 🧩 UI Components & Styling
-- **🧩 shadcn/ui** - High-quality, accessible components built on Radix UI
-- **🎯 Lucide React** - Beautiful & consistent icon library
-- **🌈 Framer Motion** - Production-ready motion library for React
-- **🎨 Next Themes** - Perfect dark mode in 2 lines of code
+## ✨ Features
 
-### 📋 Forms & Validation
-- **🎣 React Hook Form** - Performant forms with easy validation
-- **✅ Zod** - TypeScript-first schema validation
+### 🎨 High-Quality Visualization
 
-### 🔄 State Management & Data Fetching
-- **🐻 Zustand** - Simple, scalable state management
-- **🔄 TanStack Query** - Powerful data synchronization for React
-- **🌐 Fetch** - Promise-based HTTP request
+- **Canvas-Based Rendering** - Smooth, anti-aliased graphics using HTML5 Canvas API with high-DPI support
+- **Animated Data Flow** - Visualize data flowing through the network with animated connections
+- **Interactive Navigation** - Zoom in/out, pan across the canvas, and click neurons to select layers
+- **Real-time Updates** - See changes instantly as you modify network architecture
 
-### 🗄️ Database & Backend
-- **🗄️ Prisma** - Next-generation TypeScript ORM
-- **🔐 NextAuth.js** - Complete open-source authentication solution
+### 🔧 Layer Configuration
 
-### 🎨 Advanced UI Features
-- **📊 TanStack Table** - Headless UI for building tables and datagrids
-- **🖱️ DND Kit** - Modern drag and drop toolkit for React
-- **📊 Recharts** - Redefined chart library built with React and D3
-- **🖼️ Sharp** - High performance image processing
+- **10+ Layer Types** - Dense, Conv2D, MaxPool2D, AvgPool2D, Dropout, BatchNorm, LSTM, GRU, Flatten, and more
+- **Full Parameter Control** - Configure units, filters, kernel size, stride, padding, activation functions
+- **Weight Initialization** - He Normal, He Uniform, Glorot Normal, Glorot Uniform, Random Normal, Zeros
+- **Activation Functions** - ReLU, Leaky ReLU, Sigmoid, Tanh, Softmax, GELU, Swish, Linear
 
-### 🌍 Internationalization & Utilities
-- **🌍 Next Intl** - Internationalization library for Next.js
-- **📅 Date-fns** - Modern JavaScript date utility library
-- **🪝 ReactUse** - Collection of essential React hooks for modern development
+### 📚 Preset Templates
 
-## 🎯 Why This Scaffold?
+Start quickly with pre-built architectures:
 
-- **🏎️ Fast Development** - Pre-configured tooling and best practices
-- **🎨 Beautiful UI** - Complete shadcn/ui component library with advanced interactions
-- **🔒 Type Safety** - Full TypeScript configuration with Zod validation
-- **📱 Responsive** - Mobile-first design principles with smooth animations
-- **🗄️ Database Ready** - Prisma ORM configured for rapid backend development
-- **🔐 Auth Included** - NextAuth.js for secure authentication flows
-- **📊 Data Visualization** - Charts, tables, and drag-and-drop functionality
-- **🌍 i18n Ready** - Multi-language support with Next Intl
-- **🚀 Production Ready** - Optimized build and deployment settings
-- **🤖 AI-Friendly** - Structured codebase perfect for AI assistance
+| Template | Description | Use Case |
+|----------|-------------|----------|
+| **Basic MLP** | Simple feedforward network | Classification tasks |
+| **Deep MLP** | 5 hidden layers with BatchNorm | Complex classification |
+| **CNN for MNIST** | Convolutional network | Image classification |
+| **VGG-style CNN** | Deep convolutional architecture | Image recognition |
+| **LSTM Sentiment** | Recurrent network | Sequence classification |
+| **Autoencoder** | Encoder-decoder architecture | Dimensionality reduction |
+
+### 💻 Code Generation
+
+Export your architecture to production-ready code:
+
+- **PyTorch** - Full implementation with training loop
+- **TensorFlow/Keras** - Model class with compile-ready code
+- **JAX/Flax** - Modern JAX implementation
+
+Options include:
+- Training boilerplate code
+- Detailed comments
+- Custom class naming
+
+### 🎯 Interactive UI
+
+- **Resizable Panels** - Customize your workspace layout
+- **Layer List** - Drag to reorder, quick add/remove layers
+- **Configuration Panel** - Intuitive sliders and dropdowns
+- **Tooltips** - Hover for detailed layer information
+
+---
 
 ## 🚀 Quick Start
 
+### Prerequisites
+
+- Node.js 18+
+- npm, yarn, pnpm, or bun
+
+### Installation
+
 ```bash
+# Clone the repository
+git clone https://github.com/VasuML07/NeuralNetworkVisualizer.git
+
+# Navigate to project directory
+cd NeuralNetworkVisualizer
+
 # Install dependencies
+npm install
+# or
+yarn install
+# or
+pnpm install
+# or
 bun install
-
-# Start development server
-bun run dev
-
-# Build for production
-bun run build
-
-# Start production server
-bun start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see your application running.
+### Development
 
-## 🤖 Powered by Z.ai
+```bash
+# Start development server
+npm run dev
+# or
+bun run dev
+```
 
-This scaffold is optimized for use with [Z.ai](https://chat.z.ai) - your AI assistant for:
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- **💻 Code Generation** - Generate components, pages, and features instantly
-- **🎨 UI Development** - Create beautiful interfaces with AI assistance  
-- **🔧 Bug Fixing** - Identify and resolve issues with intelligent suggestions
-- **📝 Documentation** - Auto-generate comprehensive documentation
-- **🚀 Optimization** - Performance improvements and best practices
+### Production Build
 
-Ready to build something amazing? Start chatting with Z.ai at [chat.z.ai](https://chat.z.ai) and experience the future of AI-powered development!
+```bash
+# Build for production
+npm run build
+
+# Start production server
+npm start
+```
+
+---
 
 ## 📁 Project Structure
 
 ```
-src/
-├── app/                 # Next.js App Router pages
-├── components/          # Reusable React components
-│   └── ui/             # shadcn/ui components
-├── hooks/              # Custom React hooks
-└── lib/                # Utility functions and configurations
+NeuralNetworkVisualizer/
+├── src/
+│   ├── app/
+│   │   ├── globals.css          # Global styles and animations
+│   │   ├── layout.tsx           # Root layout with theme
+│   │   └── page.tsx             # Main application page
+│   │
+│   ├── components/
+│   │   ├── ui/                  # shadcn/ui components
+│   │   └── neural-network/
+│   │       ├── network-canvas.tsx         # Canvas visualization
+│   │       ├── layer-config-panel.tsx     # Layer settings
+│   │       ├── layer-list.tsx             # Layer sidebar
+│   │       ├── presets-panel.tsx          # Template presets
+│   │       ├── code-generation-panel.tsx  # Code export
+│   │       └── animation-controls.tsx     # Animation controls
+│   │
+│   ├── store/
+│   │   └── neural-network-store.ts        # Zustand state management
+│   │
+│   ├── types/
+│   │   └── neural-network.ts              # TypeScript definitions
+│   │
+│   ├── hooks/                   # Custom React hooks
+│   └── lib/                     # Utility functions
+│
+├── prisma/
+│   └── schema.prisma            # Database schema (if needed)
+│
+├── public/                      # Static assets
+├── tailwind.config.ts           # Tailwind configuration
+└── tsconfig.json                # TypeScript configuration
 ```
-
-## 🎨 Available Features & Components
-
-This scaffold includes a comprehensive set of modern web development tools:
-
-### 🧩 UI Components (shadcn/ui)
-- **Layout**: Card, Separator, Aspect Ratio, Resizable Panels
-- **Forms**: Input, Textarea, Select, Checkbox, Radio Group, Switch
-- **Feedback**: Alert, Toast (Sonner), Progress, Skeleton
-- **Navigation**: Breadcrumb, Menubar, Navigation Menu, Pagination
-- **Overlay**: Dialog, Sheet, Popover, Tooltip, Hover Card
-- **Data Display**: Badge, Avatar, Calendar
-
-### 📊 Advanced Data Features
-- **Tables**: Powerful data tables with sorting, filtering, pagination (TanStack Table)
-- **Charts**: Beautiful visualizations with Recharts
-- **Forms**: Type-safe forms with React Hook Form + Zod validation
-
-### 🎨 Interactive Features
-- **Animations**: Smooth micro-interactions with Framer Motion
-- **Drag & Drop**: Modern drag-and-drop functionality with DND Kit
-- **Theme Switching**: Built-in dark/light mode support
-
-### 🔐 Backend Integration
-- **Authentication**: Ready-to-use auth flows with NextAuth.js
-- **Database**: Type-safe database operations with Prisma
-- **API Client**: HTTP requests with Fetch + TanStack Query
-- **State Management**: Simple and scalable with Zustand
-
-### 🌍 Production Features
-- **Internationalization**: Multi-language support with Next Intl
-- **Image Optimization**: Automatic image processing with Sharp
-- **Type Safety**: End-to-end TypeScript with Zod validation
-- **Essential Hooks**: 100+ useful React hooks with ReactUse for common patterns
-
-## 🤝 Get Started with Z.ai
-
-1. **Clone this scaffold** to jumpstart your project
-2. **Visit [chat.z.ai](https://chat.z.ai)** to access your AI coding assistant
-3. **Start building** with intelligent code generation and assistance
-4. **Deploy with confidence** using the production-ready setup
 
 ---
 
-Built with ❤️ for the developer community. Supercharged by [Z.ai](https://chat.z.ai) 🚀
+## 🎮 How to Use
+
+### 1. Create Architecture
+
+- Click **Presets** tab to load a template, or
+- Start from scratch with the default network
+
+### 2. Build Your Network
+
+- **Add Layers**: Click "+ Dense Layer" or use config panel
+- **Configure**: Select a layer and adjust parameters
+- **Reorder**: Use arrow buttons to move layers up/down
+- **Remove**: Click trash icon on unwanted layers
+
+### 3. Visualize
+
+- **Select**: Click on neurons to select a layer
+- **Zoom**: Scroll wheel to zoom in/out
+- **Pan**: Click and drag on empty space
+- **Animate**: Press play to see data flow animation
+
+### 4. Export Code
+
+- Switch to **Code** tab in right panel
+- Select framework (PyTorch, TensorFlow, JAX)
+- Toggle training code and comments
+- Copy or download the generated code
+
+---
+
+## 🛠️ Technology Stack
+
+| Category | Technology |
+|----------|------------|
+| **Framework** | Next.js 16 (App Router) |
+| **Language** | TypeScript 5 |
+| **Styling** | Tailwind CSS 4 |
+| **UI Components** | shadcn/ui (Radix UI) |
+| **State Management** | Zustand |
+| **Visualization** | HTML5 Canvas API |
+| **Icons** | Lucide React |
+| **Notifications** | Sonner |
+
+---
+
+## 🎨 Layer Types Reference
+
+### Dense Layer
+Fully connected neural network layer.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| Units | number | Number of neurons |
+| Activation | string | Activation function |
+| Use Bias | boolean | Whether to use bias |
+| Initializer | string | Weight initialization |
+
+### Conv2D Layer
+2D convolutional layer for processing images.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| Filters | number | Number of output filters |
+| Kernel Size | [number, number] | Size of convolution kernel |
+| Stride | [number, number] | Stride of convolution |
+| Padding | 'valid' \| 'same' | Padding mode |
+| Activation | string | Activation function |
+
+### Pooling Layers (MaxPool2D, AvgPool2D)
+Downsampling layers for reducing spatial dimensions.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| Kernel Size | [number, number] | Size of pooling window |
+| Stride | [number, number] | Stride of pooling |
+
+### Dropout Layer
+Regularization layer to prevent overfitting.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| Rate | number | Fraction of inputs to drop (0-0.9) |
+
+### BatchNorm Layer
+Batch normalization for stabilizing training.
+
+### LSTM / GRU Layers
+Recurrent layers for sequence processing.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| Units | number | Number of hidden units |
+| Activation | string | Activation function |
+
+### Flatten Layer
+Flattens multi-dimensional input to 1D.
+
+---
+
+## 📊 Activation Functions
+
+| Function | Color | Best For |
+|----------|-------|----------|
+| ReLU | 🟢 Green | Hidden layers, fast training |
+| Leaky ReLU | 🟢 Teal | Avoiding dead neurons |
+| Sigmoid | 🔵 Blue | Binary classification output |
+| Tanh | 🟡 Amber | Hidden layers, bounded output |
+| Softmax | 🟣 Purple | Multi-class classification output |
+| GELU | 🩷 Pink | Transformer architectures |
+| Swish | 🔵 Cyan | Deep networks |
+| Linear | ⚫ Gray | Regression output |
+
+---
+
+## 🔌 API Reference
+
+### State Management (Zustand)
+
+```typescript
+// Access the store
+import { useNeuralNetworkStore } from '@/store/neural-network-store';
+
+// Available actions
+const {
+  network,           // Current network configuration
+  selectedLayerId,   // Currently selected layer
+  animation,         // Animation state
+  zoom,              // Canvas zoom level
+  pan,               // Canvas pan offset
+  
+  // Actions
+  addLayer,          // Add new layer
+  removeLayer,       // Remove layer by ID
+  updateLayer,       // Update layer properties
+  reorderLayers,     // Change layer order
+  selectLayer,       // Select a layer
+  loadPreset,        // Load preset template
+  resetNetwork,      // Reset to default
+  setAnimation,      // Control animation
+  setZoom,           // Set zoom level
+  setPan,            // Set pan offset
+} = useNeuralNetworkStore();
+```
+
+### Layer Interface
+
+```typescript
+interface NeuralLayer {
+  id: string;
+  type: LayerType;
+  name: string;
+  units: number;
+  activation: ActivationFunction;
+  dropout?: number;
+  kernelSize?: [number, number];
+  stride?: [number, number];
+  padding?: 'valid' | 'same';
+  filters?: number;
+  inputShape?: number[];
+  initializer?: string;
+  useBias?: boolean;
+}
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch
+   ```bash
+   git checkout -b feat/feature-name
+   ```
+3. Commit your changes
+   ```bash
+   git commit -m "feat: add feature description"
+   ```
+4. Push to the branch
+   ```bash
+   git push origin feat/feature-name
+   ```
+5. Open a Pull Request
+
+### Contribution Guidelines
+
+- Follow Conventional Commits
+- Maintain TypeScript strict mode
+- Update documentation for UI changes
+- Test on multiple screen sizes
+
+---
+
+## 🗺️ Roadmap
+
+| Version | Features |
+|---------|----------|
+| **v0.2** | ResNet/Inception templates, layer visualization |
+| **v0.3** | Training simulation with loss/accuracy charts |
+| **v0.4** | Collaborative editing, save/load networks |
+| **v0.5** | Custom layer creation, attention visualization |
+| **v1.0** | ONNX export, Hugging Face integration |
+
+---
+
+## 📄 License
+
+MIT License © 2024 VasuML07
+
+---
+
+## 📬 Contact
+
+- **GitHub**: [@VasuML07](https://github.com/VasuML07)
+- **Repository**: [NeuralNetworkVisualizer](https://github.com/VasuML07/NeuralNetworkVisualizer)
+
+---
+
+## 🙏 Acknowledgments
+
+- [shadcn/ui](https://ui.shadcn.com/) - Beautiful UI components
+- [Lucide](https://lucide.dev/) - Open-source icons
+- [Zustand](https://zustand-demo.pmnd.rs/) - Simple state management
+- [Next.js](https://nextjs.org/) - The React framework
+
+---
+
+**If this project helps you, consider giving it a ⭐ star!**
