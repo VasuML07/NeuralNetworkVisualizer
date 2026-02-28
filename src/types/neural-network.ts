@@ -64,6 +64,50 @@ export interface CodeGenerationOptions {
   className: string;
 }
 
+export type ViewMode = 'beginner' | 'advanced';
+
+export type Optimizer = 'adam' | 'sgd' | 'rmsprop' | 'adamw' | 'adagrad';
+export type LossFunction = 'cross_entropy' | 'mse' | 'mae' | 'binary_crossentropy';
+
+export interface TrainingConfig {
+  learningRate: number;
+  epochs: number;
+  batchSize: number;
+  optimizer: Optimizer;
+  lossFunction: LossFunction;
+}
+
+export interface TrainingState {
+  isTraining: boolean;
+  currentEpoch: number;
+  currentLoss: number;
+  currentAccuracy: number;
+  lossHistory: number[];
+  accuracyHistory: number[];
+}
+
+export interface VisualizationSettings {
+  showWeights: boolean;
+  showActivations: boolean;
+  showGradients: boolean;
+  animateTraining: boolean;
+}
+
+export const OPTIMIZERS: { value: Optimizer; label: string }[] = [
+  { value: 'adam', label: 'Adam' },
+  { value: 'adamw', label: 'AdamW' },
+  { value: 'sgd', label: 'SGD' },
+  { value: 'rmsprop', label: 'RMSprop' },
+  { value: 'adagrad', label: 'Adagrad' },
+];
+
+export const LOSS_FUNCTIONS: { value: LossFunction; label: string }[] = [
+  { value: 'cross_entropy', label: 'Cross Entropy' },
+  { value: 'mse', label: 'Mean Squared Error' },
+  { value: 'mae', label: 'Mean Absolute Error' },
+  { value: 'binary_crossentropy', label: 'Binary Cross Entropy' },
+];
+
 export const ACTIVATION_COLORS: Record<ActivationFunction, string> = {
   relu: '#22c55e',
   sigmoid: '#3b82f6',

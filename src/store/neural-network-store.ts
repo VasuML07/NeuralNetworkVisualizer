@@ -1,5 +1,15 @@
 import { create } from 'zustand';
-import { NeuralLayer, NetworkConfig, NetworkPreset, AnimationState, Framework, CodeGenerationOptions } from '@/types/neural-network';
+import { 
+  NeuralLayer, 
+  NetworkConfig, 
+  NetworkPreset, 
+  AnimationState, 
+  CodeGenerationOptions,
+  ViewMode,
+  TrainingConfig,
+  TrainingState,
+  VisualizationSettings
+} from '@/types/neural-network';
 
 const generateId = () => Math.random().toString(36).substring(2, 11);
 
@@ -145,15 +155,38 @@ export const NETWORK_PRESETS: NetworkPreset[] = [
 ];
 
 interface NeuralNetworkState {
+  // Network State
   network: NetworkConfig;
   presets: NetworkPreset[];
   selectedLayerId: string | null;
-  animation: AnimationState;
-  codeOptions: CodeGenerationOptions;
+  
+  // View State
+  viewMode: ViewMode;
   zoom: number;
   pan: { x: number; y: number };
   
-  // Actions
+  // Animation State
+  animation: AnimationState;
+  
+  // Training State
+  trainingConfig: TrainingConfig;
+  training: TrainingState;
+  
+  // Visualization Settings
+  visualization: VisualizationSettings;
+  
+  // Code Generation
+  codeOptions: CodeGenerationOptions;
+  
+  // UI State
+  expandedSections: {
+    architecture: boolean;
+    training: boolean;
+    visualization: boolean;
+    code: boolean;
+  };
+  
+  // Network Actions
   setNetwork: (network: NetworkConfig) => void;
   addLayer: (type: NeuralLayer['type'], afterIndex?: number) => void;
   removeLayer: (layerId: string) => void;
@@ -162,10 +195,29 @@ interface NeuralNetworkState {
   selectLayer: (layerId: string | null) => void;
   loadPreset: (presetId: string) => void;
   resetNetwork: () => void;
-  setAnimation: (animation: Partial<AnimationState>) => void;
-  setCodeOptions: (options: Partial<CodeGenerationOptions>) => void;
+  
+  // View Actions
+  setViewMode: (mode: ViewMode) => void;
   setZoom: (zoom: number) => void;
   setPan: (pan: { x: number; y: number }) => void;
+  
+  // Animation Actions
+  setAnimation: (animation: Partial<AnimationState>) => void;
+  
+  // Training Actions
+  setTrainingConfig: (config: Partial<TrainingConfig>) => void;
+  startTraining: () => void;
+  stopTraining: () => void;
+  updateTrainingProgress: (epoch: number, loss: number, accuracy: number) => void;
+  
+  // Visualization Actions
+  setVisualization: (settings: Partial<VisualizationSettings>) => void;
+  
+  // Code Actions
+  setCodeOptions: (options: Partial<CodeGenerationOptions>) => void;
+  
+  // UI Actions
+  toggleSection: (section: 'architecture' | 'training' | 'visualization' | 'code') => void;
 }
 
 const createDefaultNetwork = (): NetworkConfig => ({
@@ -182,24 +234,66 @@ const createDefaultNetwork = (): NetworkConfig => ({
 });
 
 export const useNeuralNetworkStore = create<NeuralNetworkState>((set, get) => ({
+  // Network State
   network: createDefaultNetwork(),
   presets: NETWORK_PRESETS,
   selectedLayerId: null,
+  
+  // View State
+  viewMode: 'beginner',
+  zoom: 1,
+  pan: { x: 0, y: 0 },
+  
+  // Animation State
   animation: {
     isPlaying: false,
     speed: 1,
     currentStep: 0,
     totalSteps: 100,
   },
+  
+  // Training State
+  trainingConfig: {
+    learningRate: 0.001,
+    epochs: 10,
+    batchSize: 32,
+    optimizer: 'adam',
+    lossFunction: 'cross_entropy',
+  },
+  training: {
+    isTraining: false,
+    currentEpoch: 0,
+    currentLoss: 0,
+    currentAccuracy: 0,
+    lossHistory: [],
+    accuracyHistory: [],
+  },
+  
+  // Visualization Settings
+  visualization: {
+    showWeights: false,
+    showActivations: false,
+    showGradients: false,
+    animateTraining: true,
+  },
+  
+  // Code Generation
   codeOptions: {
     framework: 'pytorch',
     includeTraining: true,
     includeComments: true,
     className: 'NeuralNetwork',
   },
-  zoom: 1,
-  pan: { x: 0, y: 0 },
+  
+  // UI State
+  expandedSections: {
+    architecture: false,
+    training: false,
+    visualization: false,
+    code: false,
+  },
 
+  // Network Actions
   setNetwork: (network) => set({ network }),
 
   addLayer: (type, afterIndex) => {
@@ -216,7 +310,7 @@ export const useNeuralNetworkStore = create<NeuralNetworkState>((set, get) => ({
 
   removeLayer: (layerId) => {
     const { network, selectedLayerId } = get();
-    if (network.layers.length <= 2) return; // Keep at least input and output
+    if (network.layers.length <= 2) return;
     set({
       network: {
         ...network,
@@ -255,23 +349,98 @@ export const useNeuralNetworkStore = create<NeuralNetworkState>((set, get) => ({
         network: {
           id: generateId(),
           name: preset.name,
-          layers: preset.layers.map((l, i) => ({ ...l, id: generateId() })),
+          layers: preset.layers.map(() => ({ ...createDefaultLayer('dense', 0), id: generateId() })),
           inputShape: preset.inputShape,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         selectedLayerId: null,
       });
+      // Reload with correct preset layers
+      const state = get();
+      set({
+        network: {
+          id: generateId(),
+          name: preset.name,
+          layers: preset.layers.map(l => ({ ...l, id: generateId() })),
+          inputShape: preset.inputShape,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
     }
   },
 
-  resetNetwork: () => set({ network: createDefaultNetwork(), selectedLayerId: null }),
+  resetNetwork: () => set({ 
+    network: createDefaultNetwork(), 
+    selectedLayerId: null,
+    training: {
+      isTraining: false,
+      currentEpoch: 0,
+      currentLoss: 0,
+      currentAccuracy: 0,
+      lossHistory: [],
+      accuracyHistory: [],
+    },
+  }),
 
-  setAnimation: (animation) => set((state) => ({ animation: { ...state.animation, ...animation } })),
-  
-  setCodeOptions: (options) => set((state) => ({ codeOptions: { ...state.codeOptions, ...options } })),
+  // View Actions
+  setViewMode: (mode) => set({ viewMode: mode }),
   
   setZoom: (zoom) => set({ zoom: Math.max(0.25, Math.min(3, zoom)) }),
   
   setPan: (pan) => set({ pan }),
+
+  // Animation Actions
+  setAnimation: (animation) => set((state) => ({ animation: { ...state.animation, ...animation } })),
+
+  // Training Actions
+  setTrainingConfig: (config) => set((state) => ({ 
+    trainingConfig: { ...state.trainingConfig, ...config } 
+  })),
+
+  startTraining: () => set((state) => ({ 
+    training: { 
+      ...state.training, 
+      isTraining: true,
+      currentEpoch: 0,
+      lossHistory: [],
+      accuracyHistory: [],
+    },
+    animation: { ...state.animation, isPlaying: true },
+  })),
+
+  stopTraining: () => set((state) => ({ 
+    training: { ...state.training, isTraining: false },
+    animation: { ...state.animation, isPlaying: false },
+  })),
+
+  updateTrainingProgress: (epoch, loss, accuracy) => set((state) => ({
+    training: {
+      ...state.training,
+      currentEpoch: epoch,
+      currentLoss: loss,
+      currentAccuracy: accuracy,
+      lossHistory: [...state.training.lossHistory, loss],
+      accuracyHistory: [...state.training.accuracyHistory, accuracy],
+    },
+  })),
+
+  // Visualization Actions
+  setVisualization: (settings) => set((state) => ({ 
+    visualization: { ...state.visualization, ...settings } 
+  })),
+
+  // Code Actions
+  setCodeOptions: (options) => set((state) => ({ 
+    codeOptions: { ...state.codeOptions, ...options } 
+  })),
+
+  // UI Actions
+  toggleSection: (section) => set((state) => ({
+    expandedSections: {
+      ...state.expandedSections,
+      [section]: !state.expandedSections[section],
+    },
+  })),
 }));
