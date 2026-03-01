@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { LayerConfig, NetworkState, CodeGenerationOptions, Framework, generateId } from '@/types/neural-network';
 
+export type OverfittingRisk = 'low' | 'moderate' | 'high';
+
 interface NeuralNetworkStore {
   // Network State - Only layers and neurons
   network: NetworkState;
@@ -8,11 +10,15 @@ interface NeuralNetworkStore {
   // Code Generation Options
   codeOptions: CodeGenerationOptions;
   
+  // Training Samples for overfitting risk
+  trainingSamples: number;
+  
   // Actions
   setLayerCount: (count: number) => void;
   setNeuronsForLayer: (layerId: string, neurons: number) => void;
   setFramework: (framework: Framework) => void;
   setClassName: (name: string) => void;
+  setTrainingSamples: (samples: number) => void;
   resetNetwork: () => void;
 }
 
@@ -30,6 +36,8 @@ export const useNeuralNetworkStore = create<NeuralNetworkStore>((set, get) => ({
     framework: 'pytorch',
     className: 'NeuralNetwork',
   },
+  
+  trainingSamples: 1000,
 
   setLayerCount: (count: number) => {
     const { network } = get();
@@ -75,9 +83,13 @@ export const useNeuralNetworkStore = create<NeuralNetworkStore>((set, get) => ({
   setClassName: (name: string) => {
     set(state => ({ codeOptions: { ...state.codeOptions, className: name } }));
   },
+  
+  setTrainingSamples: (samples: number) => {
+    set({ trainingSamples: Math.max(1, samples) });
+  },
 
   resetNetwork: () => {
-    set({ network: createDefaultNetwork() });
+    set({ network: createDefaultNetwork(), trainingSamples: 1000 });
   },
 }));
 
@@ -92,4 +104,23 @@ export function calculateParameters(layers: LayerConfig[]): number {
     total += prevNeurons * currNeurons + currNeurons; // weights + biases
   }
   return total;
+}
+
+// Calculate overfitting risk based on parameters vs training samples
+export function calculateOverfittingRisk(totalParams: number, trainingSamples: number): OverfittingRisk {
+  if (trainingSamples <= 0) return 'high';
+  
+  // If total_parameters > training_samples → High Risk
+  if (totalParams > trainingSamples) {
+    return 'high';
+  }
+  
+  // If total_parameters is approximately equal to training_samples (within ±20%) → Moderate Risk
+  const threshold = trainingSamples * 0.2;
+  if (Math.abs(totalParams - trainingSamples) <= threshold) {
+    return 'moderate';
+  }
+  
+  // If total_parameters < training_samples → Low Risk
+  return 'low';
 }

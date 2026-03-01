@@ -1,14 +1,15 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { useNeuralNetworkStore, calculateParameters } from '@/store/neural-network-store';
+import { useNeuralNetworkStore, calculateParameters, calculateOverfittingRisk } from '@/store/neural-network-store';
 import { getCode, getFileName } from '@/lib/code-generator';
 import { Framework, LAYER_COLORS } from '@/types/neural-network';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RotateCcw, Copy, Download, Check, Network, Code2, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { RotateCcw, Copy, Download, Check, Network, Code2, Info, HelpCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Network Canvas Component
@@ -179,13 +180,45 @@ function NetworkCanvas({ layers }: { layers: { id: string; neurons: number }[] }
   );
 }
 
+// Overfitting Risk Badge Component
+function OverfittingRiskBadge({ risk }: { risk: 'low' | 'moderate' | 'high' }) {
+  const config = {
+    low: { color: 'bg-green-500', label: '🟢 Low Risk', textColor: 'text-green-400' },
+    moderate: { color: 'bg-yellow-500', label: '🟡 Moderate Risk', textColor: 'text-yellow-400' },
+    high: { color: 'bg-red-500', label: '🔴 High Risk', textColor: 'text-red-400' },
+  };
+
+  const { label, textColor } = config[risk];
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className={`text-sm font-medium ${textColor}`}>{label}</span>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <HelpCircle className="w-4 h-4 text-gray-500 cursor-help" />
+          </TooltipTrigger>
+          <TooltipContent className="max-w-xs text-xs">
+            <p>This is a heuristic estimate based on model capacity vs dataset size. Not a guaranteed prediction.</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>
+  );
+}
+
 // Builder Tab Component
 function BuilderTab() {
-  const { network, setLayerCount, setNeuronsForLayer, resetNetwork } = useNeuralNetworkStore();
+  const { network, trainingSamples, setLayerCount, setNeuronsForLayer, setTrainingSamples, resetNetwork } = useNeuralNetworkStore();
 
   const handleLayerCountChange = (value: string) => {
     const count = parseInt(value) || 1;
     setLayerCount(count);
+  };
+
+  const handleTrainingSamplesChange = (value: string) => {
+    const samples = parseInt(value) || 1;
+    setTrainingSamples(samples);
   };
 
   return (
@@ -230,6 +263,19 @@ function BuilderTab() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Training Samples */}
+        <div className="flex items-center gap-4">
+          <Label className="text-sm text-gray-300 w-32">Training Samples</Label>
+          <Input
+            type="number"
+            min={1}
+            max={10000000}
+            value={trainingSamples}
+            onChange={(e) => handleTrainingSamplesChange(e.target.value)}
+            className="w-24 bg-white/5 border-white/10 text-white"
+          />
         </div>
 
         {/* Actions */}
@@ -316,9 +362,10 @@ function CodeTab() {
 
 // Info Tab Component
 function InfoTab() {
-  const { network } = useNeuralNetworkStore();
+  const { network, trainingSamples } = useNeuralNetworkStore();
   const totalParams = calculateParameters(network.layers);
   const totalNeurons = network.layers.reduce((sum, l) => sum + l.neurons, 0);
+  const overfittingRisk = calculateOverfittingRisk(totalParams, trainingSamples);
 
   return (
     <div className="space-y-6">
@@ -336,6 +383,18 @@ function InfoTab() {
           <div className="flex justify-between text-sm">
             <span className="text-gray-400">Total Parameters</span>
             <span className="text-violet-400 font-mono">{totalParams.toLocaleString()}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-400">Training Samples</span>
+            <span className="text-white font-mono">{trainingSamples.toLocaleString()}</span>
+          </div>
+          
+          {/* Overfitting Risk Indicator */}
+          <div className="pt-2 border-t border-white/5 mt-2">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-400">Overfitting Risk</span>
+              <OverfittingRiskBadge risk={overfittingRisk} />
+            </div>
           </div>
         </div>
       </div>
@@ -391,12 +450,7 @@ export default function NeuralNetworkVisualizer() {
     <div className="min-h-screen flex flex-col bg-[#0a0a0f] text-white">
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 border-b border-white/5">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-            <Network className="w-4 h-4 text-white" />
-          </div>
-          <h1 className="text-base font-medium text-white">Neural Network Visualizer</h1>
-        </div>
+        <h1 className="text-base font-medium text-white">Neural Network Visualizer</h1>
       </header>
 
       {/* Main Content */}
