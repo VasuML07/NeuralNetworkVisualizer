@@ -96,7 +96,7 @@ npm run dev
 bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [https://neural-network-visualizer-zeta.vercel.app/](https://neural-network-visualizer-zeta.vercel.app/) in your browser.
 
 ### Production Build
 
