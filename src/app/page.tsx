@@ -449,8 +449,8 @@ export default function NeuralNetworkVisualizer() {
   return (
     <div className="min-h-screen flex flex-col bg-[#0a0a0f] text-white">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-white/5">
-        <h1 className="text-base font-medium text-white">Neural Network Visualizer</h1>
+      <header className="flex items-center justify-center py-3 border-b border-white/5">
+        <img src="/logo.png" alt="Neural Network Visualizer" className="h-10" />
       </header>
 
       {/* Main Content */}
