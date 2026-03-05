@@ -4,21 +4,31 @@
 dom elements,useeffect runs code after rendering.usememo memoizes expensive 
 calculations*/
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-/*these imports are global state manager*/
+/*these imports are global state manager  functions used are useneuralnetwork store which acsess
+app state,calculate paraameters which computes model paramaters and another calculateoverfittingrisk
+which estimates ml risk*/
 import { useNeuralNetworkStore, calculateParameters, calculateOverfittingRisk } from '@/store/neural-network-store';
+/*this is impoert base for code generator */
 import { getCode, getFileName } from '@/lib/code-generator';
+/*this imports are used for which color which layer should get*/
 import { Framework, LAYER_COLORS } from '@/types/neural-network';
+//these are ui buttons
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+/*this importation is used to control the 3 tabs */
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { RotateCcw, Copy, Download, Check, Network, Code2, Info, HelpCircle } from 'lucide-react';
+//this importation is used for notifications
 import { toast } from 'sonner';
 
 // Network Canvas Component
+//this function is used for rendering the neural network
 function NetworkCanvas({ layers }: { layers: { id: string; neurons: number }[] }) {
+  //creates a canvas dom element
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  //sets the dimensions for canvas
   const [dimensions, setDimensions] = useState({ width: 600, height: 400 });
   const containerRef = useRef<HTMLDivElement>(null);
 
