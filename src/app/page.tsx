@@ -1,3 +1,4 @@
+//this tells ne
 'use client';
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
