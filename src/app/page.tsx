@@ -1,7 +1,10 @@
-//this tells ne
+//this tells next.js to run on client side instead of server
 'use client';
-
+/*imports react hooks like usestate which stores ui state,useref which references 
+dom elements,useeffect runs code after rendering.usememo memoizes expensive 
+calculations*/
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+/*these imports are global state manager*/
 import { useNeuralNetworkStore, calculateParameters, calculateOverfittingRisk } from '@/store/neural-network-store';
 import { getCode, getFileName } from '@/lib/code-generator';
 import { Framework, LAYER_COLORS } from '@/types/neural-network';
